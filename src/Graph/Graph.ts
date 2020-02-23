@@ -73,10 +73,7 @@ export default class Graph<T> {
     }
     // if edge is null in both directions, remove edge altogether
     if (fromEdge.nullified() && toEdge.nullified()) {
-      const fromVertex = this.getVertex(fromId);
-      const toVertex = this.getVertex(toId);
-      fromVertex!.edges.delete(toId);
-      toVertex!.edges.delete(fromId);
+      this._deleteEdge(fromId, toId);
     }
   }
 
@@ -102,10 +99,6 @@ export default class Graph<T> {
   }
 
   setEdge(fromId: number, toId: number, weight: EdgeWeight): void {
-    if (weight === null) {
-      this.removeEdge(fromId, toId);
-      return;
-    }
     const fromEdge = this.getEdge(fromId, toId);
     const toEdge = this.getEdge(toId, fromId);
     if (!fromEdge || !toEdge) {
@@ -117,5 +110,15 @@ export default class Graph<T> {
       fromEdge.from = weight;
       toEdge.to = weight;
     }
+    if (fromEdge.nullified() && toEdge.nullified()) {
+      this._deleteEdge(fromId, toId);
+    }
+  }
+
+  _deleteEdge(fromId: number, toId: number): void {
+    const fromVertex = this.getVertex(fromId);
+    const toVertex = this.getVertex(toId);
+    fromVertex!.edges.delete(toId);
+    toVertex!.edges.delete(fromId);
   }
 }
