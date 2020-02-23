@@ -97,6 +97,9 @@ export default class Graph<T> {
     return fromVertex.edges.get(toId);
   }
 
+  // set edge to desired weight
+  // handles both directed and undirected edges
+  // will delete an edge from the adjacency list entirely if both directions become null
   setEdge(fromId: number, toId: number, weight: EdgeWeight): void {
     const fromEdge = this.getEdge(fromId, toId);
     const toEdge = this.getEdge(toId, fromId);
