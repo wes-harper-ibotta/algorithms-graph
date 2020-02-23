@@ -174,7 +174,7 @@ export default class Graph<T> {
       const stackNode = pathStack.pop()!;
       const currentVertex = stackNode[0];
       const currentPath = stackNode[1];
-      // if the current vertex is our destination vertex, break the loop
+      // if the current vertex is our destination vertex, add path to list of result paths
       if (currentVertex.id === endingVertexId) {
         result.push(currentPath);
       }
