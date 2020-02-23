@@ -88,6 +88,7 @@ export default class Graph<T> {
     vertex.val = val;
   }
 
+  // returns entire edge for one vertex including both to and from weights
   getEdge(fromId: number, toId: number): Edge | undefined {
     const fromVertex = this.getVertex(fromId);
     const toVertex = this.getVertex(toId);
@@ -117,6 +118,7 @@ export default class Graph<T> {
     }
   }
 
+  // remove an edge from all adjacency lists entirely
   _deleteEdge(fromId: number, toId: number): void {
     const fromVertex = this.getVertex(fromId);
     const toVertex = this.getVertex(toId);
