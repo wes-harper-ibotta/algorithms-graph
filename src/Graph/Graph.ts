@@ -60,6 +60,9 @@ export default class Graph<T> {
     toVertex.edges.set(fromId, fromEdge);
   }
 
+  // this removes an edge in one direction if directed
+  // setEdge will remove the edge entirely if necessary
+  // for deletion from the map, reference _deleteEdge()
   removeEdge(fromId: number, toId: number): void {
     const fromEdge = this.getEdge(fromId, toId);
     const toEdge = this.getEdge(toId, fromId);
@@ -70,10 +73,6 @@ export default class Graph<T> {
     // remove edges in both directions if graph is not directed
     if (!this.directed) {
       this.setEdge(toId, fromId, null);
-    }
-    // if edge is null in both directions, remove edge altogether
-    if (fromEdge.nullified() && toEdge.nullified()) {
-      this._deleteEdge(fromId, toId);
     }
   }
 
