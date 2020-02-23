@@ -1,5 +1,6 @@
 import Edge, { EdgeWeight } from './Edge';
 import Vertex from './Vertex';
+import Stack from '@/Stack/Stack';
 
 export default class Graph<T> {
   // must set directed property at instantiation
@@ -116,6 +117,88 @@ export default class Graph<T> {
       this._deleteEdge(fromId, toId);
     }
   }
+
+  // return any valid path between start and end vertices without cycles or [] if there are none
+  isReachable(startingVertexId: number, endingVertexId: number): number[] {
+    const startVertex = this.getVertex(startingVertexId);
+    const endVertex = this.getVertex(endingVertexId);
+    if (!startVertex || !endVertex) {
+      throw new Error('VertexError: vertex does not exist');
+    }
+    // this marks vertices as "visited"
+    const visitedVertices = new Set<Vertex<T>>();
+    // this will keep track of our vertices in a DFS manner as we go
+    const pathStack = new Stack<[Vertex<T>, number[]]>();
+
+    visitedVertices.add(startVertex);
+    pathStack.push([startVertex, [startVertex.id]]);
+    while (pathStack.head) {
+      // get vertex off the top of the stack (furthest along in the path DFS)
+      const stackNode = pathStack.pop()!;
+      const currentVertex = stackNode[0];
+      const currentPath = stackNode[1];
+      // if the current vertex is our destination vertex, break the loop
+      if (currentVertex.id === endingVertexId) {
+        return currentPath;
+      }
+      currentVertex.edges.forEach((_, vertexId: number) => {
+        const vertex = this.getVertex(vertexId)!;
+        // add each vertex to the stack if it hasn't already been visited
+        if (!visitedVertices.has(vertex)) {
+          visitedVertices.add(vertex);
+          pathStack.push([vertex, [...currentPath, vertex.id]]);
+        }
+      });
+    }
+    return [];
+  }
+
+  // return all paths between a start vertex and end vertex or [] if there are none
+  allPaths(startingVertexId: number, endingVertexId: number): number[][] {
+    const startVertex = this.getVertex(startingVertexId);
+    const endVertex = this.getVertex(endingVertexId);
+    if (!startVertex || !endVertex) {
+      throw new Error('VertexError: vertex does not exist');
+    }
+    // store all valid paths
+    const result: number[][] = [];
+    // this marks vertices as "visited"
+    const visitedVertices = new Set<Vertex<T>>();
+    // this will keep track of our vertices in a DFS manner as we go
+    const pathStack = new Stack<[Vertex<T>, number[]]>();
+
+    visitedVertices.add(startVertex);
+    pathStack.push([startVertex, [startVertex.id]]);
+    while (pathStack.head) {
+      // get vertex off the top of the stack (furthest along in the path DFS)
+      const stackNode = pathStack.pop()!;
+      const currentVertex = stackNode[0];
+      const currentPath = stackNode[1];
+      // if the current vertex is our destination vertex, break the loop
+      if (currentVertex.id === endingVertexId) {
+        result.push(currentPath);
+      }
+      currentVertex.edges.forEach((_, vertexId: number) => {
+        const vertex = this.getVertex(vertexId)!;
+        // add each vertex to the stack if it hasn't already been visited
+        if (!visitedVertices.has(vertex)) {
+          visitedVertices.add(vertex);
+          pathStack.push([vertex, [...currentPath, vertex.id]]);
+        }
+      });
+    }
+    return result;
+  }
+
+  // return a path representing the fewest possible "turns"
+  // essentially the shortest path ignoring edge weight
+  // returns an array of vertex IDs
+  // shortestPath(startingVertexId: number, endingVertexId: number): number[] {}
+
+  // return a path representing the fastest possible route between vertices
+  // this accounts for edge weight
+  // returns an array of vertex IDs
+  // quickestPath(startingVertexId: number, endingVertexId: number): number[] {}
 
   // remove an edge from all adjacency lists entirely
   private _deleteEdge(fromId: number, toId: number): void {
