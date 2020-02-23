@@ -32,8 +32,7 @@ export default class Graph<T> {
         removedVertexEdges: Map<number, Edge>
       ) => {
         // remove the edge from all other vertices' adjacency lists in both directions
-        this.removeEdge(vertex.id, currentVertexId);
-        this.removeEdge(currentVertexId, vertex.id);
+        this._deleteEdge(vertex.id, currentVertexId);
       }
     );
     return vertex;
