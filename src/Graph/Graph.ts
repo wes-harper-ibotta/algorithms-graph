@@ -119,7 +119,7 @@ export default class Graph<T> {
   }
 
   // remove an edge from all adjacency lists entirely
-  _deleteEdge(fromId: number, toId: number): void {
+  private _deleteEdge(fromId: number, toId: number): void {
     const fromVertex = this.getVertex(fromId);
     const toVertex = this.getVertex(toId);
     fromVertex!.edges.delete(toId);
