@@ -93,11 +93,12 @@ export default class Graph<T> {
   }
 
   getEdge(fromId: number, toId: number): Edge | undefined {
-    const vertex = this.getVertex(fromId);
-    if (!vertex) {
+    const fromVertex = this.getVertex(fromId);
+    const toVertex = this.getVertex(toId);
+    if (!fromVertex || !toVertex) {
       throw new Error('VertexError: vertex does not exist');
     }
-    return vertex.edges.get(toId);
+    return fromVertex.edges.get(toId);
   }
 
   setEdge(fromId: number, toId: number, weight: EdgeWeight): void {
