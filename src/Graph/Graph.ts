@@ -247,6 +247,7 @@ export default class Graph<T> {
     const pathQueue = new FlexHeap<VertexWithPath<T>>(comparator);
     pathQueue.insert([startVertex!, [startVertex!.id], 0]);
     while (pathQueue.size > 0) {
+      // because this is a priority queue, we always get the next best path based on the comparator
       const vertexWithPath = pathQueue.extract()!;
       const currentVertex = vertexWithPath[0];
       const currentPath = vertexWithPath[1];
@@ -263,6 +264,7 @@ export default class Graph<T> {
           const vertex = this.getVertex(vertexId)!;
           pathQueue.insert([
             vertex,
+            // add the edge weight and allow the comparator to promote to the next best spot if necessary
             [...currentPath, vertex.id, currentEdgeWeight + edge.to]
           ]);
         }
