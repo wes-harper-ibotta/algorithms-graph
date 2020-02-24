@@ -222,7 +222,7 @@ export default class Graph<T> {
   // return a path representing the fastest possible route between vertices
   // this accounts for edge weight
   // returns an array of vertex IDs
-  // by using a comparator, this method can also be used as an a* implementation of Best First Search
+  // by using a comparator, this method can also be used as an a* implementation or Best First Search
   // this also allows the implementer to choose whether a higher or lower edge weight should be considered "best"
   quickestPath(
     startingVertexId: number,
