@@ -87,6 +87,52 @@ describe('`FlexHeap`', () => {
         const h = new FlexHeap<number>(defaultComparator);
         expect(h.extract()).toBe(null);
       });
+      test('does not remove `null` value at index 0', () => {
+        const h = new FlexHeap<number>(defaultComparator);
+        expect(h.items[0]).toBe(null);
+      });
+    });
+
+    describe('when there is at least one value', () => {
+      test('returns the highest priority value', () => {
+        const h = new FlexHeap<number>(defaultComparator);
+        h.insert(1);
+        expect(h.extract()).toBe(1);
+      });
+
+      test('retains "heap-ness" as items are removed', () => {
+        const h = new FlexHeap<number>(defaultComparator);
+        h.insert(3);
+        h.insert(2);
+        h.insert(0);
+        h.insert(1);
+        h.insert(0);
+        h.insert(5);
+        h.insert(3);
+        h.insert(4);
+        while (h.size > 0) {
+          h.extract();
+          expect(isMinHeap(h)).toBe(true);
+        }
+      });
+
+      test('removes values in priority order', () => {
+        const h = new FlexHeap<number>(defaultComparator);
+        h.insert(3);
+        h.insert(2);
+        h.insert(0);
+        h.insert(1);
+        h.insert(0);
+        h.insert(5);
+        h.insert(3);
+        h.insert(4);
+        let currVal: number = h.extract()!;
+        while (h.size > 0) {
+          const poppedVal = h.extract()!;
+          expect(poppedVal >= currVal).toBe(true);
+          currVal = poppedVal;
+        }
+      });
     });
   });
 });
