@@ -6,35 +6,43 @@ import { FlexHeap } from '@/FlexHeap';
 // combine vertex with path information for use in pathfinding algorithms
 // include EdgeWeight as an optional third value for best path algorithms
 
-type VertexWithPath<K, V> = [Vertex<K, V>, K[], EdgeWeight?];
-export default class Graph<K, V> {
+type VertexWithPath<VertexID, VertexValue> = [
+  Vertex<VertexID, VertexValue>,
+  VertexID[],
+  EdgeWeight?
+];
+export default class Graph<VertexID, VertexValue> {
   // must set directed property at instantiation
   readonly directed: boolean;
-  head: Vertex<K, V> | null;
-  vertices: Map<K, Vertex<K, V>>;
+  head: Vertex<VertexID, VertexValue> | null;
+  vertices: Map<VertexID, Vertex<VertexID, VertexValue>>;
 
   constructor(directed: boolean = true) {
-    this.vertices = new Map<K, Vertex<K, V>>();
+    this.vertices = new Map<VertexID, Vertex<VertexID, VertexValue>>();
     this.directed = directed;
     this.head = null;
   }
 
-  addVertex(id: K, val: V): void {
+  addVertex(id: VertexID, val: VertexValue): void {
     if (this.vertices.has(id)) {
       throw new Error('VertexError: Vertex already exists');
     }
-    const vertex = new Vertex<K, V>(id, val);
+    const vertex = new Vertex<VertexID, VertexValue>(id, val);
     this.vertices.set(vertex.id, vertex);
   }
 
-  removeVertex(id: K): Vertex<K, V> | undefined {
+  removeVertex(id: VertexID): Vertex<VertexID, VertexValue> | undefined {
     const vertex = this.getVertex(id);
     if (!vertex) {
       return undefined;
     }
     this.vertices.delete(vertex.id);
     vertex.edges.forEach(
-      (_: Edge, currentVertexId: K, removedVertexEdges: Map<K, Edge>) => {
+      (
+        _: Edge,
+        currentVertexId: VertexID,
+        removedVertexEdges: Map<VertexID, Edge>
+      ) => {
         // remove the edge from all other vertices' adjacency lists in both directions
         this._deleteEdge(vertex.id, currentVertexId);
       }
@@ -43,7 +51,7 @@ export default class Graph<K, V> {
   }
 
   // add or overwrite edge between two vertices
-  addEdge(fromId: K, toId: K, weight?: number): void {
+  addEdge(fromId: VertexID, toId: VertexID, weight?: number): void {
     // provide a default weight of 1 if user does not provide a weight
     weight = weight || 1;
     const fromVertex = this.getVertex(fromId);
@@ -64,7 +72,7 @@ export default class Graph<K, V> {
   // this removes an edge in one direction if directed
   // setEdge will remove the edge entirely if necessary
   // for deletion from the map, reference _deleteEdge()
-  removeEdge(fromId: K, toId: K): void {
+  removeEdge(fromId: VertexID, toId: VertexID): void {
     const fromEdge = this.getEdge(fromId, toId);
     const toEdge = this.getEdge(toId, fromId);
     if (!fromEdge || !toEdge) {
@@ -77,18 +85,18 @@ export default class Graph<K, V> {
     }
   }
 
-  getVertex(id: K): Vertex<K, V> | undefined {
+  getVertex(id: VertexID): Vertex<VertexID, VertexValue> | undefined {
     return this.vertices.get(id);
   }
 
-  setVertex(id: K, val: V): void {
+  setVertex(id: VertexID, val: VertexValue): void {
     const vertex = this.getVertex(id);
     this._passOrThrowVertexException(vertex);
     vertex!.val = val;
   }
 
   // returns entire edge for one vertex including both to and from weights
-  getEdge(fromId: K, toId: K): Edge | undefined {
+  getEdge(fromId: VertexID, toId: VertexID): Edge | undefined {
     const fromVertex = this.getVertex(fromId);
     const toVertex = this.getVertex(toId);
     this._passOrThrowVertexException(fromVertex, toVertex);
@@ -98,7 +106,7 @@ export default class Graph<K, V> {
   // set edge to desired weight
   // handles both directed and undirected edges
   // will delete an edge from the adjacency list entirely if both directions become null
-  setEdge(fromId: K, toId: K, weight: EdgeWeight): void {
+  setEdge(fromId: VertexID, toId: VertexID, weight: EdgeWeight): void {
     const fromEdge = this.getEdge(fromId, toId);
     const toEdge = this.getEdge(toId, fromId);
     if (!fromEdge || !toEdge) {
@@ -116,14 +124,17 @@ export default class Graph<K, V> {
   }
 
   // return any valid path between start and end vertices without cycles or [] if there are none
-  isReachable(startingVertexId: K, endingVertexId: K): K[] {
+  isReachable(
+    startingVertexId: VertexID,
+    endingVertexId: VertexID
+  ): VertexID[] {
     const startVertex = this.getVertex(startingVertexId);
     const endVertex = this.getVertex(endingVertexId);
     this._passOrThrowVertexException(startVertex, endVertex);
     // this marks vertices as "visited"
-    const visitedVertices = new Set<Vertex<K, V>>();
+    const visitedVertices = new Set<Vertex<VertexID, VertexValue>>();
     // this will keep track of our vertices in a DFS manner as we go
-    const pathStack = new Stack<VertexWithPath<K, V>>();
+    const pathStack = new Stack<VertexWithPath<VertexID, VertexValue>>();
 
     pathStack.push([startVertex!, [startVertex!.id]]);
     while (pathStack.head) {
@@ -137,7 +148,7 @@ export default class Graph<K, V> {
       if (currentVertex.id === endingVertexId) {
         return currentPath;
       }
-      currentVertex.edges.forEach((edge: Edge, vertexId: K) => {
+      currentVertex.edges.forEach((edge: Edge, vertexId: VertexID) => {
         const vertex = this.getVertex(vertexId)!;
         // add each vertex to the stack if it hasn't already been visited
         if (edge.to !== null && !visitedVertices.has(vertex)) {
@@ -149,16 +160,16 @@ export default class Graph<K, V> {
   }
 
   // return all paths between a start vertex and end vertex or [] if there are none
-  allPaths(startingVertexId: K, endingVertexId: K): K[][] {
+  allPaths(startingVertexId: VertexID, endingVertexId: VertexID): VertexID[][] {
     const startVertex = this.getVertex(startingVertexId);
     const endVertex = this.getVertex(endingVertexId);
     this._passOrThrowVertexException(startVertex, endVertex);
     // store all valid paths
-    const result: K[][] = [];
+    const result: VertexID[][] = [];
     // this marks vertices as "visited"
-    const visitedVertices = new Set<Vertex<K, V>>();
+    const visitedVertices = new Set<Vertex<VertexID, VertexValue>>();
     // this will keep track of our vertices in a DFS manner as we go
-    const pathStack = new Stack<VertexWithPath<K, V>>();
+    const pathStack = new Stack<VertexWithPath<VertexID, VertexValue>>();
 
     pathStack.push([startVertex!, [startVertex!.id]]);
     while (pathStack.head) {
@@ -172,7 +183,7 @@ export default class Graph<K, V> {
       if (currentVertex.id === endingVertexId) {
         result.push(currentPath);
       }
-      currentVertex.edges.forEach((edge: Edge, vertexId: K) => {
+      currentVertex.edges.forEach((edge: Edge, vertexId: VertexID) => {
         const vertex = this.getVertex(vertexId)!;
         // add each vertex to the stack if it hasn't already been visited
         if (edge.to !== null && !visitedVertices.has(vertex)) {
@@ -186,13 +197,16 @@ export default class Graph<K, V> {
   // return a path representing the fewest possible "turns"
   // essentially the shortest path ignoring edge weight
   // returns an array of vertex IDs
-  shortestPath(startingVertexId: K, endingVertexId: K): K[] {
+  shortestPath(
+    startingVertexId: VertexID,
+    endingVertexId: VertexID
+  ): VertexID[] {
     const startVertex = this.getVertex(startingVertexId);
     const endVertex = this.getVertex(endingVertexId);
     this._passOrThrowVertexException(startVertex, endVertex);
 
-    const visitedVertices = new Set<K>();
-    const pathQueue = new Queue<VertexWithPath<K, V>>();
+    const visitedVertices = new Set<VertexID>();
+    const pathQueue = new Queue<VertexWithPath<VertexID, VertexValue>>();
 
     pathQueue.enqueue([startVertex!, [startVertex!.id]]);
 
@@ -206,7 +220,7 @@ export default class Graph<K, V> {
       }
 
       visitedVertices.add(currentVertex.id);
-      currentVertex.edges.forEach((edge: Edge, vertexId: K): void => {
+      currentVertex.edges.forEach((edge: Edge, vertexId: VertexID): void => {
         if (edge.to !== null && !visitedVertices.has(vertexId)) {
           const vertex = this.getVertex(vertexId)!;
           pathQueue.enqueue([vertex, [...currentPath, vertex.id]]);
@@ -222,13 +236,13 @@ export default class Graph<K, V> {
   // by using a comparator, this method can also be used as an a* implementation or Best First Search
   // this also allows the implementer to choose whether a higher or lower edge weight should be considered "best"
   quickestPath(
-    startingVertexId: K,
-    endingVertexId: K,
+    startingVertexId: VertexID,
+    endingVertexId: VertexID,
     comparator?: (
-      visited: VertexWithPath<K, V>,
-      current: VertexWithPath<K, V>
+      visited: VertexWithPath<VertexID, VertexValue>,
+      current: VertexWithPath<VertexID, VertexValue>
     ) => boolean
-  ): K[] {
+  ): VertexID[] {
     const startVertex = this.getVertex(startingVertexId);
     const endVertex = this.getVertex(endingVertexId);
     this._passOrThrowVertexException(startVertex, endVertex);
@@ -237,13 +251,15 @@ export default class Graph<K, V> {
     comparator =
       comparator ||
       ((
-        visited: VertexWithPath<K, V>,
-        current: VertexWithPath<K, V>
+        visited: VertexWithPath<VertexID, VertexValue>,
+        current: VertexWithPath<VertexID, VertexValue>
       ): boolean => visited[2]! > current[2]!);
 
-    const visitedVertices = new Set<K>();
+    const visitedVertices = new Set<VertexID>();
     // use a priority queue to choose the next best path
-    const pathQueue = new FlexHeap<VertexWithPath<K, V>>(comparator);
+    const pathQueue = new FlexHeap<VertexWithPath<VertexID, VertexValue>>(
+      comparator
+    );
     pathQueue.insert([startVertex!, [startVertex!.id], 0]);
     while (pathQueue.size > 0) {
       // because this is a priority queue, we always get the next best path based on the comparator
@@ -258,7 +274,7 @@ export default class Graph<K, V> {
 
       visitedVertices.add(currentVertex.id);
 
-      currentVertex.edges.forEach((edge: Edge, vertexId: K): void => {
+      currentVertex.edges.forEach((edge: Edge, vertexId: VertexID): void => {
         if (edge.to !== null && !visitedVertices.has(vertexId)) {
           const vertex = this.getVertex(vertexId)!;
           pathQueue.insert([
@@ -274,7 +290,7 @@ export default class Graph<K, V> {
   }
 
   // remove an edge from all adjacency lists entirely
-  private _deleteEdge(fromId: K, toId: K): void {
+  private _deleteEdge(fromId: VertexID, toId: VertexID): void {
     const fromVertex = this.getVertex(fromId);
     const toVertex = this.getVertex(toId);
     fromVertex!.edges.delete(toId);
@@ -282,9 +298,11 @@ export default class Graph<K, V> {
   }
 
   private _passOrThrowVertexException(
-    ...vertices: (Vertex<K, V> | undefined)[]
+    ...vertices: (Vertex<VertexID, VertexValue> | undefined)[]
   ): void | never {
-    vertices.forEach((vertex: Vertex<K, V> | undefined): void | never => {
+    vertices.forEach((vertex: Vertex<VertexID, VertexValue> | undefined):
+      | void
+      | never => {
       if (!vertex) {
         throw new Error('VertexError: vertex does not exist');
       }
