@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node ./src"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +16,8 @@
     "tslint": "^6.0.0",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.8.2"
+  },
+  "dependencies": {
+    "@types/jest": "^25.1.3"
   }
 }
