@@ -42,4 +42,44 @@ describe('`Queue`', () => {
       });
     });
   });
+
+  describe('`dequeue()`', () => {
+    describe('when the queue is empty', () => {
+      test('returns null', () => {
+        const q = new Queue<any>();
+        expect(q.dequeue()).toBe(null);
+      });
+    });
+
+    describe('when the queue has at least one value', () => {
+      let q: Queue<number>;
+      beforeEach(() => {
+        q = new Queue<number>();
+        q.enqueue(1);
+      });
+
+      test('returns the value of the node that gets removed', () => {
+        expect(q.dequeue()).toBe(1);
+      });
+
+      test('removes nodes in "FIFO" order', () => {
+        q.enqueue(2);
+        q.enqueue(3);
+        q.enqueue(4);
+
+        let testVal = 1;
+        while (q.head) {
+          expect(q.dequeue()).toBe(testVal++);
+        }
+      });
+
+      describe('when the last value is removed', () => {
+        test('it sets `head` and `tail` to `null`', () => {
+          q.dequeue();
+          expect(q.head).toBe(null);
+          expect(q.tail).toBe(null);
+        });
+      });
+    });
+  });
 });
