@@ -1,13 +1,8 @@
-import QueueNode from './QueueNode';
+import { QueueNode } from './';
 
 export default class Queue<T> {
-  head: QueueNode<T> | null;
-  tail: QueueNode<T> | null;
-
-  constructor() {
-    this.head = null;
-    this.tail = null;
-  }
+  head: QueueNode<T> | null = null;
+  tail: QueueNode<T> | null = null;
 
   enqueue(val: T): void {
     const node = new QueueNode<T>(val);

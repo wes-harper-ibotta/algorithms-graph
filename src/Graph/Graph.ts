@@ -1,8 +1,7 @@
-import Edge, { EdgeWeight } from './Edge';
-import Vertex from './Vertex';
-import Stack from '@/Stack/Stack';
-import Queue from '@/Queue/Queue';
-import FlexHeap from '@/FlexHeap/FlexHeap';
+import { Edge, EdgeWeight, Vertex } from './';
+import { Stack } from '@/Stack';
+import { Queue } from '@/Queue';
+import { FlexHeap } from '@/FlexHeap';
 
 // combine vertex with path information for use in pathfinding algorithms
 // include EdgeWeight as an optional third value for best path algorithms

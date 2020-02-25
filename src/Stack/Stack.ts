@@ -1,4 +1,4 @@
-import StackNode from './StackNode';
+import { StackNode } from './';
 
 export default class Stack<T> {
   head: StackNode<T> | null;
