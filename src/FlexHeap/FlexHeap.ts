@@ -52,27 +52,34 @@ export default class FlexHeap<T> {
     while (true) {
       const firstChildIndex = currentIndex * 2;
       const secondChildIndex = firstChildIndex + 1;
-      if (
-        firstChildIndex <= this.size &&
-        this.comparator(this.items[currentIndex]!, this.items[firstChildIndex]!)
-      ) {
-        [this.items[firstChildIndex], this.items[currentIndex]] = [
-          this.items[currentIndex],
-          this.items[firstChildIndex]
-        ];
-        currentIndex = firstChildIndex;
-      } else if (
-        secondChildIndex <= this.size &&
-        this.comparator(
-          this.items[currentIndex]!,
+
+      if (firstChildIndex > this.size) {
+        break;
+      }
+
+      let higherPriorityIndex: number;
+      if (secondChildIndex <= this.size) {
+        higherPriorityIndex = this.comparator(
+          this.items[firstChildIndex]!,
           this.items[secondChildIndex]!
         )
+          ? secondChildIndex
+          : firstChildIndex;
+      } else {
+        higherPriorityIndex = firstChildIndex;
+      }
+
+      if (
+        this.comparator(
+          this.items[currentIndex]!,
+          this.items[higherPriorityIndex]!
+        )
       ) {
-        [this.items[secondChildIndex], this.items[currentIndex]] = [
+        [this.items[higherPriorityIndex], this.items[currentIndex]] = [
           this.items[currentIndex],
-          this.items[secondChildIndex]
+          this.items[higherPriorityIndex]
         ];
-        currentIndex = secondChildIndex;
+        currentIndex = higherPriorityIndex;
       } else {
         break;
       }
