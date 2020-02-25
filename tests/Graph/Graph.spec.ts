@@ -196,13 +196,15 @@ describe('`Graph`', () => {
 
     describe('when edge exists', () => {
       describe('when graph is `directed`', () => {
-        const graph = new Graph<any, any>();
-        graph.addVertex('a', 'test1');
-        graph.addVertex('b', 'test2');
-        graph.addEdge('a', 'b', 2);
-        expect(graph.getEdge('a', 'b')).toBeTruthy();
-        graph.removeEdge('a', 'b');
-        expect(graph.getEdge('a', 'b')).toBeUndefined();
+        test('removes the edge entirely in both directions', () => {
+          const graph = new Graph<any, any>();
+          graph.addVertex('a', 'test1');
+          graph.addVertex('b', 'test2');
+          graph.addEdge('a', 'b', 2);
+          expect(graph.getEdge('a', 'b')).toBeTruthy();
+          graph.removeEdge('a', 'b');
+          expect(graph.getEdge('a', 'b')).toBeUndefined();
+        });
       });
     });
   });
