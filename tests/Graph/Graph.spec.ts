@@ -65,4 +65,96 @@ describe('`Graph`', () => {
       });
     });
   });
+
+  describe('`addEdge()`', () => {
+    describe('when any given vertex does not exist', () => {
+      test('throws an error', () => {
+        const graph = new Graph<string, string>();
+        expect(() => {
+          graph.addEdge('a', 'b');
+        }).toThrow(new RegExp('^VertexError:'));
+      });
+    });
+
+    describe('when vertices exist', () => {
+      describe('when `directed` is `false`', () => {
+        test('creates an edge where both `to` and `from` are equal', () => {
+          const graph = new Graph<string, string>(false);
+          graph.addVertex('a', 'test1');
+          graph.addVertex('b', 'test2');
+          graph.addEdge('a', 'b', 1);
+          expect(graph.getVertex('a')!.edges.get('b')!).toEqual({
+            to: 1,
+            from: 1
+          });
+          expect(graph.getVertex('b')!.edges.get('a')!).toEqual({
+            to: 1,
+            from: 1
+          });
+        });
+
+        describe('when an edge already exists', () => {
+          test('overwrites the edge', () => {
+            const graph = new Graph<string, string>(false);
+            graph.addVertex('a', 'test1');
+            graph.addVertex('b', 'test2');
+            graph.addEdge('a', 'b', 1);
+            expect(graph.getVertex('a')!.edges.get('b')!).toEqual({
+              to: 1,
+              from: 1
+            });
+            expect(graph.getVertex('b')!.edges.get('a')!).toEqual({
+              to: 1,
+              from: 1
+            });
+
+            graph.addEdge('a', 'b', 2);
+            expect(graph.getVertex('a')!.edges.get('b')!).toEqual({
+              to: 2,
+              from: 2
+            });
+            expect(graph.getVertex('b')!.edges.get('a')!).toEqual({
+              to: 2,
+              from: 2
+            });
+          });
+        });
+      });
+
+      describe('when `directed` is `true`', () => {
+        test('creates a directional edge on both vertices', () => {
+          const graph = new Graph<string, string>();
+          graph.addVertex('a', 'test1');
+          graph.addVertex('b', 'test2');
+          graph.addEdge('a', 'b', 1);
+          expect(graph.getVertex('a')!.edges.get('b')!).toEqual({
+            to: 1,
+            from: null
+          });
+          expect(graph.getVertex('b')!.edges.get('a')!).toEqual({
+            to: null,
+            from: 1
+          });
+        });
+
+        describe('when the edge exists', () => {
+          test('overwrites the directional edge on both sides', () => {
+            const graph = new Graph<string, string>();
+            graph.addVertex('a', 'test1');
+            graph.addVertex('b', 'test2');
+            graph.addEdge('a', 'b', 1);
+            graph.addEdge('b', 'a', 2);
+            expect(graph.getVertex('a')!.edges.get('b')!).toEqual({
+              to: null,
+              from: 2
+            });
+            expect(graph.getVertex('b')!.edges.get('a')!).toEqual({
+              to: 2,
+              from: null
+            });
+          });
+        });
+      });
+    });
+  });
 });
