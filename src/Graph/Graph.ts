@@ -19,7 +19,7 @@ export default class Graph<K, V> {
     this.head = null;
   }
 
-  addVertex(id: K, val: T): void {
+  addVertex(id: K, val: V): void {
     if (this.vertices.has(id)) {
       throw new Error('VertexError: Vertex already exists');
     }
