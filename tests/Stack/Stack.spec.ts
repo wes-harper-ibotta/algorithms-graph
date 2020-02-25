@@ -2,27 +2,27 @@ import { Stack } from '../../src/Stack';
 
 describe('`Stack`', () => {
   describe('`push()`', () => {
-    describe('when queue is empty', () => {
-      test('new node becomes `head` of queue', () => {
+    describe('when stack is empty', () => {
+      test('new node becomes `head` of stack', () => {
         const q = new Stack<number>();
         q.push(1);
         expect(q.head!.val).toBe(1);
       });
     });
 
-    describe('when queue has at least one value', () => {
+    describe('when stack has at least one value', () => {
       let q: Stack<number>;
       beforeEach(() => {
         q = new Stack<number>();
         q.push(1);
       });
 
-      test('new node becomes new `head` of queue', () => {
+      test('new node becomes new `head` of stack', () => {
         q.push(2);
         expect(q.head!.val).toBe(2);
       });
 
-      test('queue retains insertion order', () => {
+      test('stack retains insertion order', () => {
         q.push(2);
         q.push(3);
         q.push(4);
@@ -38,14 +38,14 @@ describe('`Stack`', () => {
   });
 
   describe('`pop()`', () => {
-    describe('when the queue is empty', () => {
+    describe('when the stack is empty', () => {
       test('returns null', () => {
         const q = new Stack<any>();
         expect(q.pop()).toBe(null);
       });
     });
 
-    describe('when the queue has at least one value', () => {
+    describe('when the stack has at least one value', () => {
       let q: Stack<number>;
       beforeEach(() => {
         q = new Stack<number>();
