@@ -1,7 +1,7 @@
 import { Edge, EdgeWeight, Vertex } from './';
-import { Stack } from '@/Stack';
-import { Queue } from '@/Queue';
-import { FlexHeap } from '@/FlexHeap';
+import { Stack } from '../Stack';
+import { Queue } from '../Queue';
+import { FlexHeap } from '../FlexHeap';
 
 // combine vertex with path information for use in pathfinding algorithms
 // include EdgeWeight as an optional third value for best path algorithms
@@ -36,17 +36,11 @@ export default class Graph<VertexID, VertexValue> {
     if (!vertex) {
       return undefined;
     }
+    vertex.edges.forEach((_: Edge, currentVertexId: VertexID) => {
+      // remove the edge from all other vertices' adjacency lists in both directions
+      this._deleteEdge(vertex.id, currentVertexId);
+    });
     this.vertices.delete(vertex.id);
-    vertex.edges.forEach(
-      (
-        _: Edge,
-        currentVertexId: VertexID,
-        removedVertexEdges: Map<VertexID, Edge>
-      ) => {
-        // remove the edge from all other vertices' adjacency lists in both directions
-        this._deleteEdge(vertex.id, currentVertexId);
-      }
-    );
     return vertex;
   }
 
