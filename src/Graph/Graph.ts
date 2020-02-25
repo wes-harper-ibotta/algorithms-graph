@@ -38,7 +38,7 @@ export default class Graph<VertexID, VertexValue> {
     }
     vertex.edges.forEach((_: Edge, currentVertexId: VertexID) => {
       // remove the edge from all other vertices' adjacency lists in both directions
-      this._deleteEdge(vertex.id, currentVertexId);
+      this.removeEdge(vertex.id, currentVertexId);
     });
     this.vertices.delete(vertex.id);
     return vertex;
@@ -63,10 +63,11 @@ export default class Graph<VertexID, VertexValue> {
     toVertex!.edges.set(fromId, fromEdge);
   }
 
-  // removes an edge from the map entirely
+  // removes an edge from the map entirely in both directions
   removeEdge(fromId: VertexID, toId: VertexID): void {
     const fromVertex = this.getVertex(fromId);
     const toVertex = this.getVertex(toId);
+    this._passOrThrowVertexException(fromVertex, toVertex);
     fromVertex!.edges.delete(toId);
     toVertex!.edges.delete(fromId);
   }
