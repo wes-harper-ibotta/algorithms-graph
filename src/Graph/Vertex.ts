@@ -1,19 +1,17 @@
 import Edge from './Edge';
 
-export type VertexID = number | string;
+export default class Vertex<K, V> {
+  id: K;
+  val: V;
+  edges: Map<K, Edge>;
 
-export default class Vertex<T> {
-  id: VertexID;
-  val: T;
-  edges: Map<VertexID, Edge>;
-
-  constructor(id: VertexID, val: T) {
+  constructor(id: K, val: V) {
     this.id = id;
     this.val = val;
-    this.edges = new Map<VertexID, Edge>();
+    this.edges = new Map<K, Edge>();
   }
   // is vertex object adjacent to given vertex ID?
-  adjacent(id: VertexID): boolean {
+  adjacent(id: K): boolean {
     return !!this.edges.get(id);
   }
 }
