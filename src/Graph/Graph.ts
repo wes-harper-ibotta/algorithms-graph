@@ -63,20 +63,12 @@ export default class Graph<VertexID, VertexValue> {
     toVertex!.edges.set(fromId, fromEdge);
   }
 
-  // this removes an edge in one direction if directed
-  // setEdge will remove the edge entirely if necessary
-  // for deletion from the map, reference _deleteEdge()
+  // removes an edge from the map entirely
   removeEdge(fromId: VertexID, toId: VertexID): void {
-    const fromEdge = this.getEdge(fromId, toId);
-    const toEdge = this.getEdge(toId, fromId);
-    if (!fromEdge || !toEdge) {
-      throw new Error('EdgeError: edge does not exist');
-    }
-    this.setEdge(fromId, toId, null);
-    // remove edges in both directions if graph is not directed
-    if (!this.directed) {
-      this.setEdge(toId, fromId, null);
-    }
+    const fromVertex = this.getVertex(fromId);
+    const toVertex = this.getVertex(toId);
+    fromVertex!.edges.delete(toId);
+    toVertex!.edges.delete(fromId);
   }
 
   getVertex(id: VertexID): Vertex<VertexID, VertexValue> | undefined {
@@ -113,7 +105,7 @@ export default class Graph<VertexID, VertexValue> {
       toEdge.to = weight;
     }
     if (fromEdge.nullified() && toEdge.nullified()) {
-      this._deleteEdge(fromId, toId);
+      this.removeEdge(fromId, toId);
     }
   }
 
@@ -281,14 +273,6 @@ export default class Graph<VertexID, VertexValue> {
       });
     }
     return [];
-  }
-
-  // remove an edge from all adjacency lists entirely
-  private _deleteEdge(fromId: VertexID, toId: VertexID): void {
-    const fromVertex = this.getVertex(fromId);
-    const toVertex = this.getVertex(toId);
-    fromVertex!.edges.delete(toId);
-    toVertex!.edges.delete(fromId);
   }
 
   private _passOrThrowVertexException(
